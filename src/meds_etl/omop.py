@@ -115,7 +115,7 @@ def load_file(path_to_decompressed_dir: str, fname: str) -> Any:
 def cast_to_datetime(table: pl.LazyFrame, column: str, move_to_end_of_day: bool = False):
     if table.schema[column] == pl.Utf8():
         if not move_to_end_of_day:
-            return (meds_etl.flat.parse_time(pl.col(column), OMOP_TIME_FORMATS),)
+            return meds_etl.flat.parse_time(pl.col(column), OMOP_TIME_FORMATS)
         else:
             # Try to cast time to a datetime but if only the date is available, then use
             # that date with a timestamp of 23:59:59
@@ -207,9 +207,7 @@ def write_event_data(
             fallback_concept_id = pl.lit(table_details.get("fallback_concept_id", None), dtype=pl.Int64)
 
             concept_id = (
-                pl.when(source_concept_id != 0)
-                .then(source_concept_id)
-                .when(concept_id != 0)
+                pl.when(concept_id != 0)
                 .then(concept_id)
                 .otherwise(fallback_concept_id)
             )
@@ -312,7 +310,7 @@ def write_event_data(
         # Write this part of the MEDS Flat file to disk
         fname = os.path.join(path_to_MEDS_flat_dir, f'{table_name.replace("/", "_")}_{uuid.uuid4()}.parquet')
         try:
-            event_data.sink_parquet(fname, compression="zstd", compression_level=1, maintain_order=False)
+            event_data.collect().write_parquet(fname, compression="zstd", compression_level=1)
         except pl.exceptions.InvalidOperationError as e:
             print(table_name)
             print(e)
