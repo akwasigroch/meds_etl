@@ -209,6 +209,8 @@ def write_event_data(
             concept_id = (
                 pl.when(concept_id != 0)
                 .then(concept_id)
+                .when(source_concept_id != 0)
+                .then(source_concept_id)
                 .otherwise(fallback_concept_id)
             )
 
