@@ -33,7 +33,7 @@ if mp is None:
     mp = multiprocessing.get_context()
 
 Format = Literal["csv", "parquet", "compressed_csv"]
-KNOWN_COLUMNS = {"patient_id", "numeric_value", "datetime_value", "text_value", "value", "time", "code", "end"}
+KNOWN_COLUMNS = {"patient_id", "numeric_value", "datetime_value", "text_value", "value", "time", "code", "end", "visit_id"}
 
 
 def convert_file_to_flat(source_file: str, *, target_flat_data_path: str, format: Format, time_format: str) -> None:
